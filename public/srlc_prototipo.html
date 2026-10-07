@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SRLC - Sistema de Reserva de Laboratorios de Cómputo</title>
+  <style>
+    /* ========================================================= */
+    /* PALETA INSTITUCIONAL Y VARIABLES UNIVERSITARIAS            */
+    /* ========================================================= */
+    :root {
+      --azul-primario: #1e3a8a;       /* Azul institucional */
+      --azul-hover: #172554;
+      --azul-claro: #eff6ff;
+      --azul-borde: #bfdbfe;
+      --gris-fondo: #f8fafc;
+      --gris-superficie: #ffffff;
+      --gris-borde: #cbd5e1;
+      --gris-texto: #1e293b;
+      --gris-secundario: #64748b;
+      --verde-exito: #15803d;
+      --verde-fondo: #f0fdf4;
+      --verde-borde: #bbf7d0;
+      --rojo-alerta: #b91c1c;
+      --rojo-fondo: #fef2f2;
+      --rojo-borde: #fecaca;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--gris-fondo);
+      color: var(--gris-texto);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ENCABEZADO SUPERIOR */
+    header {
+      background-color: var(--gris-superficie);
+      border-bottom: 3px solid var(--azul-primario);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand-lockup {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .brand-badge {
+      background-color: var(--azul-primario);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 1.15rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-titles h1 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--azul-primario);
+      line-height: 1.1;
+    }
+
+    .brand-titles p {
+      font-size: 0.75rem;
+      color: var(--gris-secundario);
+      font-weight: 500;
+    }
+
+    .header-user-zone {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .user-info {
+      color: var(--gris-secundario);
+    }
+
+    .user-info strong {
+      color: var(--gris-texto);
+    }
+
+    /* BOTONES */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1.1rem;
+      border-radius: 5px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      text-decoration: none;
+      transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background-color: var(--azul-primario);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--azul-hover);
+    }
+
+    .btn-secondary {
+      background-color: #ffffff;
+      color: var(--gris-texto);
+      border-color: var(--gris-borde);
+    }
+
+    .btn-secondary:hover {
+      background-color: #f1f5f9;
+      border-color: #94a3b8;
+    }
+
+    .btn-danger {
+      background-color: var(--rojo-fondo);
+      color: var(--rojo-alerta);
+      border-color: var(--rojo-borde);
+    }
+
+    .btn-danger:hover {
+      background-color: #fee2e2;
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.65rem;
+      font-size: 0.78rem;
+    }
+
+    .btn-block {
+      width: 100%;
+    }
+
+    /* CONTENEDOR PRINCIPAL */
+    main {
+      flex: 1;
+      max-width: 1020px;
+      width: 100%;
+      margin: 1.5rem auto;
+      padding: 0 1rem;
+    }
+
+    .screen-view {
+      display: none;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+
+    .screen-view.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* PANEL GENERAL */
+    .panel {
+      background: var(--gris-superficie);
+      border-radius: 8px;
+      border: 1px solid var(--gris-borde);
+      padding: 1.75rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      margin-bottom: 1.5rem;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid var(--gris-borde);
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+      gap: 1rem;
+    }
+
+    .panel-header h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--azul-primario);
+    }
+
+    .panel-header p {
+      font-size: 0.85rem;
+      color: var(--gris-secundario);
+      margin-top: 0.2rem;
+    }
+
+    /* ========================================================= */
+    /* PANTALLA 1: INICIO DE SESIÓN                              */
+    /* ========================================================= */
+    .login-container {
+      min-height: calc(100vh - 160px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .login-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 8px;
+      border: 1px solid var(--gris-borde);
+      padding: 2.25rem 2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .login-badge-center {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .login-badge-center .badge-logo {
+      display: inline-block;
+      background: var(--azul-claro);
+      color: var(--azul-primario);
+      font-weight: 800;
+      font-size: 1.25rem;
+      padding: 0.35rem 1.1rem;
+      border-radius: 6px;
+      border: 1px solid var(--azul-borde);
+      margin-bottom: 0.85rem;
+    }
+
+    .login-badge-center h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--azul-primario);
+      line-height: 1.3;
+    }
+
+    .login-badge-center .subtitle {
+      font-size: 0.82rem;
+      color: var(--gris-secundario);
+      margin-top: 0.25rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.15rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+      color: var(--gris-texto);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid var(--gris-borde);
+      border-radius: 4px;
+      font-size: 0.9rem;
+      background-color: #ffffff;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--azul-primario);
+      box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.12);
+    }
+
+    .login-footer-text {
+      font-size: 0.8rem;
+      color: var(--gris-secundario);
+      text-align: center;
+      margin-top: 1.25rem;
+      padding-top: 1rem;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    /* ========================================================= */
+    /* PANTALLA 2: MENÚ PRINCIPAL                                */
+    /* ========================================================= */
+    .dashboard-header {
+      background: linear-gradient(135deg, #1e3a8a, #1e40af);
+      color: #ffffff;
+      padding: 1.75rem;
+      border-radius: 8px;
+      margin-bottom: 1.75rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .dashboard-header h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 0.3rem;
+    }
+
+    .dashboard-header p {
+      font-size: 0.9rem;
+      opacity: 0.95;
+    }
+
+    .menu-options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .menu-card {
+      background: #ffffff;
+      border: 1px solid var(--gris-borde);
+      border-radius: 8px;
+      padding: 1.5rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+      min-height: 160px;
+    }
+
+    .menu-card:hover {
+      border-color: var(--azul-primario);
+      box-shadow: 0 6px 12px rgba(30, 58, 138, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .card-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--azul-claro);
+      color: var(--azul-primario);
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 0.85rem;
+    }
+
+    .menu-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--gris-texto);
+      margin-bottom: 0.4rem;
+    }
+
+    .menu-card p {
+      font-size: 0.82rem;
+      color: var(--gris-secundario);
+      line-height: 1.4;
+    }
+
+    .card-action-hint {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--azul-primario);
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    /* ========================================================= */
+    /* PANTALLA 3 & 4: FORMULARIOS Y TABLAS                      */
+    /* ========================================================= */
+    .form-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--gris-borde);
+      border-radius: 6px;
+      margin-top: 1rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.875rem;
+    }
+
+    th {
+      background-color: #f8fafc;
+      color: var(--gris-texto);
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--gris-borde);
+    }
+
+    td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--gris-borde);
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background-color: #fafbfc;
+    }
+
+    /* BADGES DE ESTADO */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    .badge-disponible {
+      background-color: var(--verde-fondo);
+      color: var(--verde-exito);
+      border: 1px solid var(--verde-borde);
+    }
+
+    .badge-ocupado {
+      background-color: var(--rojo-fondo);
+      color: var(--rojo-alerta);
+      border: 1px solid var(--rojo-borde);
+    }
+
+    .badge-confirmada {
+      background-color: var(--verde-fondo);
+      color: var(--verde-exito);
+      border: 1px solid var(--verde-borde);
+    }
+
+    .badge-cancelada {
+      background-color: #f1f5f9;
+      color: var(--gris-secundario);
+      border: 1px solid #e2e8f0;
+      text-decoration: line-through;
+    }
+
+    /* MODAL DE CONFIRMACIÓN */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(2px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #ffffff;
+      width: 100%;
+      max-width: 440px;
+      border-radius: 8px;
+      border: 1px solid var(--gris-borde);
+      padding: 1.75rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-content h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--azul-primario);
+      margin-bottom: 0.6rem;
+    }
+
+    .modal-content p {
+      font-size: 0.88rem;
+      color: var(--gris-texto);
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+
+    /* FOOTER */
+    footer {
+      background: #ffffff;
+      border-top: 1px solid var(--gris-borde);
+      padding: 1.25rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--gris-secundario);
+      margin-top: auto;
+    }
+
+    @media (max-width: 640px) {
+      header { padding: 0.75rem 1rem; }
+      .brand-titles p { display: none; }
+      .dashboard-header { padding: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ENCABEZADO SUPERIOR -->
+  <header>
+    <div class="brand-lockup">
+      <div class="brand-badge">SRLC</div>
+      <div class="brand-titles">
+        <h1>SRLC</h1>
+        <p>Sistema de Reserva de Laboratorios de Cómputo</p>
+      </div>
+    </div>
+    <div class="header-user-zone" id="headerUser" style="display: none;">
+      <span class="user-info">Usuario: <strong>Docente</strong></span>
+      <button class="btn btn-secondary btn-sm" onclick="irA('login')">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ========================================================= -->
+    <!-- PANTALLA 1: INICIO DE SESIÓN                              -->
+    <!-- ========================================================= -->
+    <section id="view-login" class="screen-view active">
+      <div class="login-container">
+        <div class="login-card">
+          <div class="login-badge-center">
+            <div class="badge-logo">SRLC</div>
+            <h2>Sistema de Reserva de Laboratorios de Cómputo</h2>
+            <p class="subtitle">Plataforma Universitaria Institucional</p>
+          </div>
+
+          <form onsubmit="ejecutarLogin(event)">
+            <div class="form-group">
+              <label for="campo-usuario">Usuario</label>
+              <input type="text" id="campo-usuario" class="form-control" value="docente" required placeholder="Código docente o correo institucional">
+            </div>
+
+            <div class="form-group">
+              <label for="campo-password">Contraseña</label>
+              <input type="password" id="campo-password" class="form-control" value="123456" required placeholder="••••••••">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Ingresar</button>
+            <p class="login-footer-text">Acceso para docentes y responsables de laboratorio.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- PANTALLA 2: MENÚ PRINCIPAL                                -->
+    <!-- ========================================================= -->
+    <section id="view-menu" class="screen-view">
+      <div class="dashboard-header">
+        <h2>Bienvenido al SRLC</h2>
+        <p>Sistema universitario de gestión para reserva y control de disponibilidad de laboratorios de cómputo.</p>
+      </div>
+
+      <div class="menu-options-grid">
+        <!-- Tarjeta 1: Consultar laboratorios -->
+        <div class="menu-card" onclick="irA('disponibilidad')">
+          <div>
+            <div class="card-number">1</div>
+            <h3>Consultar laboratorios</h3>
+            <p>Revise la disponibilidad en tiempo real filtrando por fecha, horario y capacidad requerida.</p>
+          </div>
+          <div class="card-action-hint">Ingresar &rarr;</div>
+        </div>
+
+        <!-- Tarjeta 2: Realizar reserva -->
+        <div class="menu-card" onclick="irA('registrar')">
+          <div>
+            <div class="card-number">2</div>
+            <h3>Realizar reserva</h3>
+            <p>Registre una nueva solicitud de laboratorio para sesiones de práctica o evaluaciones.</p>
+          </div>
+          <div class="card-action-hint">Registrar &rarr;</div>
+        </div>
+
+        <!-- Tarjeta 3: Mis reservas -->
+        <div class="menu-card" onclick="irA('mis-reservas')">
+          <div>
+            <div class="card-number">3</div>
+            <h3>Mis reservas</h3>
+            <p>Consulte la lista completa de reservas confirmadas y su historial académico.</p>
+          </div>
+          <div class="card-action-hint">Ver reservas &rarr;</div>
+        </div>
+
+        <!-- Tarjeta 4: Cancelar reserva -->
+        <div class="menu-card" onclick="irA('mis-reservas')">
+          <div>
+            <div class="card-number">4</div>
+            <h3>Cancelar reserva</h3>
+            <p>Anule o cancele reservas previamente programadas con un solo clic.</p>
+          </div>
+          <div class="card-action-hint">Gestionar &rarr;</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- PANTALLA 3: CONSULTA DE DISPONIBILIDAD                    -->
+    <!-- ========================================================= -->
+    <section id="view-disponibilidad" class="screen-view">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>Consultar disponibilidad de laboratorios</h2>
+            <p>Ingrese los criterios de búsqueda para verificar laboratorios libres</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="irA('menu')">Volver al menú</button>
+        </div>
+
+        <form onsubmit="ejecutarBusquedaDisponibilidad(event)">
+          <div class="form-grid-4">
+            <div class="form-group">
+              <label for="filtro-fecha">Fecha</label>
+              <input type="date" id="filtro-fecha" class="form-control" value="2026-10-15" required>
+            </div>
+            <div class="form-group">
+              <label for="filtro-inicio">Hora de inicio</label>
+              <input type="time" id="filtro-inicio" class="form-control" value="10:00" required>
+            </div>
+            <div class="form-group">
+              <label for="filtro-fin">Hora de término</label>
+              <input type="time" id="filtro-fin" class="form-control" value="12:00" required>
+            </div>
+            <div class="form-group">
+              <label for="filtro-capacidad">Capacidad requerida</label>
+              <input type="number" id="filtro-capacidad" class="form-control" value="25" min="1" max="50" required>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: flex-end;">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+          </div>
+        </form>
+
+        <div style="margin-top: 1.5rem;">
+          <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--gris-texto); margin-bottom: 0.5rem;">
+            Resultado de la consulta:
+          </h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Laboratorio</th>
+                  <th>Capacidad</th>
+                  <th>Horario</th>
+                  <th>Estado</th>
+                  <th style="text-align: right;">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="cuerpoTablaDisponibilidad">
+                <tr>
+                  <td><strong>Lab. 01</strong></td>
+                  <td>30</td>
+                  <td class="col-horario">10:00–12:00</td>
+                  <td><span class="badge badge-disponible">Disponible</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-primary btn-sm" onclick="reservarLaboratorio('Lab. 01')">Reservar</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Lab. 02</strong></td>
+                  <td>25</td>
+                  <td class="col-horario">10:00–12:00</td>
+                  <td><span class="badge badge-ocupado">Ocupado</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-secondary btn-sm" disabled style="opacity: 0.55; cursor: not-allowed;">Ocupado</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Lab. 03</strong></td>
+                  <td>40</td>
+                  <td class="col-horario">10:00–12:00</td>
+                  <td><span class="badge badge-disponible">Disponible</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-primary btn-sm" onclick="reservarLaboratorio('Lab. 03')">Reservar</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="margin-top: 1.25rem; display: flex; justify-content: flex-end;">
+          <button class="btn btn-secondary btn-sm" onclick="irA('menu')">Volver al menú</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- PANTALLA 4: REGISTRAR RESERVA                             -->
+    <!-- ========================================================= -->
+    <section id="view-registrar" class="screen-view">
+      <div class="panel" style="max-width: 720px; margin-left: auto; margin-right: auto;">
+        <div class="panel-header">
+          <div>
+            <h2>Registrar nueva reserva</h2>
+            <p>Complete la información correspondiente para generar la reserva de cómputo</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="irA('menu')">Volver al menú</button>
+        </div>
+
+        <form onsubmit="ejecutarConfirmarReserva(event)">
+          <div class="form-group">
+            <label for="form-lab">Laboratorio</label>
+            <select id="form-lab" class="form-control" required>
+              <option value="Lab. 01">Lab. 01 (Capacidad: 30)</option>
+              <option value="Lab. 02">Lab. 02 (Capacidad: 25)</option>
+              <option value="Lab. 03">Lab. 03 (Capacidad: 40)</option>
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label for="form-fecha">Fecha</label>
+              <input type="date" id="form-fecha" class="form-control" value="2026-10-15" required>
+            </div>
+            <div class="form-group">
+              <label for="form-horario">Horario</label>
+              <input type="text" id="form-horario" class="form-control" value="10:00–12:00" placeholder="Ej: 10:00–12:00" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label for="form-curso">Curso</label>
+              <input type="text" id="form-curso" class="form-control" value="Sistemas Operativos" required placeholder="Nombre de la asignatura">
+            </div>
+            <div class="form-group">
+              <label for="form-estudiantes">Número de estudiantes</label>
+              <input type="number" id="form-estudiantes" class="form-control" value="28" min="1" max="50" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="form-motivo">Motivo</label>
+            <textarea id="form-motivo" class="form-control" rows="3" required placeholder="Objetivo de la sesión en laboratorio">Práctica de concurrencia y simulación de memoria virtual</textarea>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--gris-borde);">
+            <button type="button" class="btn btn-secondary" onclick="irA('menu')">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Confirmar reserva</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- PANTALLA 5: MIS RESERVAS                                  -->
+    <!-- ========================================================= -->
+    <section id="view-mis-reservas" class="screen-view">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>Mis reservas</h2>
+            <p>Listado de solicitudes vigentes y canceladas por el docente</p>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-primary btn-sm" onclick="irA('registrar')">+ Nueva reserva</button>
+            <button class="btn btn-secondary btn-sm" onclick="irA('menu')">Volver al menú</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Laboratorio</th>
+                <th>Horario</th>
+                <th>Estado</th>
+                <th style="text-align: right;">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="cuerpoTablaMisReservas">
+              <!-- Renderizado dinámico -->
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--gris-borde); padding-top: 1rem;">
+          <span style="font-size: 0.8rem; color: var(--gris-secundario);">SRLC · Registro de reservas académicas</span>
+          <button class="btn btn-secondary btn-sm" onclick="irA('menu')">Volver al menú</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL DE CANCELACIÓN (PANTALLA 5) -->
+  <div class="modal-overlay" id="modalCancelar">
+    <div class="modal-content">
+      <h3>Cancelar reserva</h3>
+      <p id="msgConfirmarCancelar">¿Está seguro de cancelar esta reserva?</p>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="cerrarModalCancelar()">No, mantener</button>
+        <button class="btn btn-danger" onclick="procesarCancelacionReserva()">Sí, cancelar reserva</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE CONFIRMACIÓN DE ÉXITO (PANTALLA 4) -->
+  <div class="modal-overlay" id="modalExito">
+    <div class="modal-content">
+      <h3 style="color: var(--verde-exito);">Reserva registrada correctamente.</h3>
+      <p id="msgExitoDetalle">Su solicitud de laboratorio ha sido ingresada satisfactoriamente en el sistema.</p>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="cerrarExitoEIrA('menu')">Menú Principal</button>
+        <button class="btn btn-primary" onclick="cerrarExitoEIrA('mis-reservas')">Visualizar Mis reservas</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>SRLC - Sistema de Reserva de Laboratorios de Cómputo &copy; 2026 | Prototipo Académico Universitario</p>
+  </footer>
+
+  <script>
+    // DATOS DE EJEMPLO REQUERIDOS
+    let listaReservas = [
+      { id: '1', fecha: '15/10/2026', laboratorio: 'Lab. 02', horario: '08:00–10:00', estado: 'Confirmada' },
+      { id: '2', fecha: '16/10/2026', laboratorio: 'Lab. 01', horario: '14:00–16:00', estado: 'Confirmada' },
+      { id: '3', fecha: '18/10/2026', laboratorio: 'Lab. 03', horario: '10:00–12:00', estado: 'Confirmada' }
+    ];
+
+    let idReservaSeleccionadaParaCancelar = null;
+
+    // NAVEGACIÓN ENTRE PANTALLAS
+    function irA(nombrePantalla) {
+      document.querySelectorAll('.screen-view').forEach(function(el) {
+        el.classList.remove('active');
+      });
+
+      const objetivo = document.getElementById('view-' + nombrePantalla);
+      if (objetivo) {
+        objetivo.classList.add('active');
+      }
+
+      // Control de visualización del usuario en el encabezado
+      const headerUser = document.getElementById('headerUser');
+      if (nombrePantalla === 'login') {
+        headerUser.style.display = 'none';
+      } else {
+        headerUser.style.display = 'flex';
+      }
+
+      // Si entra a "Mis reservas", actualizar la tabla
+      if (nombrePantalla === 'mis-reservas') {
+        renderizarMisReservas();
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // PANTALLA 1: LOGIN
+    function ejecutarLogin(e) {
+      e.preventDefault();
+      irA('menu');
+    }
+
+    // PANTALLA 3: BUSCAR DISPONIBILIDAD
+    function ejecutarBusquedaDisponibilidad(e) {
+      e.preventDefault();
+      const inicio = document.getElementById('filtro-inicio').value;
+      const fin = document.getElementById('filtro-fin').value;
+      const horario = inicio + '–' + fin;
+
+      document.querySelectorAll('.col-horario').forEach(function(el) {
+        el.textContent = horario;
+      });
+    }
+
+    // PANTALLA 3 -> PANTALLA 4: PRE-SELECCIONAR LABORATORIO
+    function reservarLaboratorio(nombreLab) {
+      document.getElementById('form-lab').value = nombreLab;
+      const f = document.getElementById('filtro-fecha').value;
+      const hi = document.getElementById('filtro-inicio').value;
+      const hf = document.getElementById('filtro-fin').value;
+      if (f) document.getElementById('form-fecha').value = f;
+      if (hi && hf) document.getElementById('form-horario').value = hi + '–' + hf;
+      irA('registrar');
+    }
+
+    // PANTALLA 4: CONFIRMAR RESERVA
+    function ejecutarConfirmarReserva(e) {
+      e.preventDefault();
+      const lab = document.getElementById('form-lab').value;
+      const fechaVal = document.getElementById('form-fecha').value;
+      const partes = fechaVal.split('-');
+      const fechaFormateada = partes.length === 3 ? (partes[2] + '/' + partes[1] + '/' + partes[0]) : fechaVal;
+      const horario = document.getElementById('form-horario').value;
+
+      const nuevaReserva = {
+        id: String(Date.now()),
+        fecha: fechaFormateada,
+        laboratorio: lab,
+        horario: horario,
+        estado: 'Confirmada'
+      };
+
+      listaReservas.unshift(nuevaReserva);
+
+      document.getElementById('msgExitoDetalle').textContent = 
+        'Reserva confirmada para ' + lab + ' el ' + fechaFormateada + ' en horario ' + horario + '.';
+      document.getElementById('modalExito').classList.add('active');
+    }
+
+    function cerrarExitoEIrA(destino) {
+      document.getElementById('modalExito').classList.remove('active');
+      irA(destino);
+    }
+
+    // PANTALLA 5: MIS RESERVAS
+    function renderizarMisReservas() {
+      const tbody = document.getElementById('cuerpoTablaMisReservas');
+      tbody.innerHTML = '';
+
+      listaReservas.forEach(function(r) {
+        const tr = document.createElement('tr');
+
+        const tdFecha = document.createElement('td');
+        tdFecha.textContent = r.fecha;
+
+        const tdLab = document.createElement('td');
+        tdLab.innerHTML = '<strong>' + r.laboratorio + '</strong>';
+
+        const tdHorario = document.createElement('td');
+        tdHorario.textContent = r.horario;
+
+        const tdEstado = document.createElement('td');
+        if (r.estado === 'Confirmada') {
+          tdEstado.innerHTML = '<span class="badge badge-confirmada">Confirmada</span>';
+        } else {
+          tdEstado.innerHTML = '<span class="badge badge-cancelada">Cancelada</span>';
+        }
+
+        const tdAccion = document.createElement('td');
+        tdAccion.style.textAlign = 'right';
+
+        if (r.estado === 'Confirmada') {
+          const btnCancelar = document.createElement('button');
+          btnCancelar.className = 'btn btn-danger btn-sm';
+          btnCancelar.textContent = 'Cancelar';
+          btnCancelar.onclick = function() {
+            solicitarCancelarReserva(r.id);
+          };
+          tdAccion.appendChild(btnCancelar);
+        } else {
+          const spanCancelada = document.createElement('span');
+          spanCancelada.style.fontSize = '0.8rem';
+          spanCancelada.style.color = 'var(--gris-secundario)';
+          spanCancelada.style.fontStyle = 'italic';
+          spanCancelada.textContent = 'Cancelada';
+          tdAccion.appendChild(spanCancelada);
+        }
+
+        tr.appendChild(tdFecha);
+        tr.appendChild(tdLab);
+        tr.appendChild(tdHorario);
+        tr.appendChild(tdEstado);
+        tr.appendChild(tdAccion);
+        tbody.appendChild(tr);
+      });
+    }
+
+    function solicitarCancelarReserva(id) {
+      idReservaSeleccionadaParaCancelar = id;
+      const res = listaReservas.find(function(item) { return item.id === id; });
+      if (res) {
+        document.getElementById('msgConfirmarCancelar').textContent = 
+          '¿Está seguro de cancelar esta reserva para ' + res.laboratorio + ' el ' + res.fecha + ' (' + res.horario + ')?';
+      }
+      document.getElementById('modalCancelar').classList.add('active');
+    }
+
+    function cerrarModalCancelar() {
+      idReservaSeleccionadaParaCancelar = null;
+      document.getElementById('modalCancelar').classList.remove('active');
+    }
+
+    function procesarCancelacionReserva() {
+      if (idReservaSeleccionadaParaCancelar) {
+        const item = listaReservas.find(function(r) { return r.id === idReservaSeleccionadaParaCancelar; });
+        if (item) {
+          item.estado = 'Cancelada';
+        }
+        cerrarModalCancelar();
+        renderizarMisReservas();
+      }
+    }
+
+    // ARRANQUE INICIAL
+    window.onload = function() {
+      irA('login');
+    };
+  </script>
+</body>
+</html>

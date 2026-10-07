@@ -1,0 +1,6 @@
+{
+  "name": "SRLC - Sistema de Reserva de Laboratorios",
+  "description": "Prototipo navegable del Sistema de Reserva de Laboratorios de Cómputo (SRLC) para docentes y responsables universitarios.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
